@@ -1,9 +1,11 @@
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, LoginSerializer
-from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from .serializers import LoginSerializer, UserSerializer
+
 
 class RegisterView(APIView):
 
@@ -14,18 +16,11 @@ class RegisterView(APIView):
             user = serializer.save()
 
             return Response(
-                {
-                    "id":user.id,
-                    "email":user.email
-                },
-                status = status.HTTP_201_CREATED
+                {"id": user.id, "email": user.email}, status=status.HTTP_201_CREATED
             )
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
 
 class LoginView(APIView):
 
@@ -38,29 +33,22 @@ class LoginView(APIView):
             email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
 
-            user = authenticate(
-                email=email,
-                password=password
-            )
+            user = authenticate(email=email, password=password)
 
             if user is not None:
 
                 refresh = RefreshToken.for_user(user)
 
-                return Response({
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token)
-                })
+                return Response(
+                    {"refresh": str(refresh), "access": str(refresh.access_token)}
+                )
 
             return Response(
                 {"error": "Invalid email or password"},
-                status=status.HTTP_401_UNAUTHORIZED
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -72,13 +60,10 @@ class LogoutView(APIView):
         if not refresh_token:
             return Response(
                 {"error": "Refresh token is required"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         token = RefreshToken(refresh_token)
         token.blacklist()
 
-        return Response(
-            {"message": "Logout successful"},
-            status=status.HTTP_200_OK
-        )
+        return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)

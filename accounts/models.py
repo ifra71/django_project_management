@@ -10,10 +10,7 @@ class UserManager(BaseUserManager):
 
         email = self.normalize_email(email)
 
-        user = self.model(
-            email=email,
-            **extra_fields
-        )
+        user = self.model(email=email, **extra_fields)
 
         user.set_password(password)
         user.save(using=self._db)
@@ -25,11 +22,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
 
-        return self.create_user(
-            email=email,
-            password=password,
-            **extra_fields
-        )
+        return self.create_user(email=email, password=password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -41,19 +34,12 @@ class User(AbstractUser):
 
     objects = UserManager()
 
-    
 
 class Profile(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="profile"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
 
     profile_picture = models.ImageField(
-        upload_to="profile_pictures/",
-        blank=True,
-        null=True
+        upload_to="profile_pictures/", blank=True, null=True
     )
 
     ROLE_CHOICES = [
@@ -62,12 +48,6 @@ class Profile(models.Model):
         ("developer", "Developer"),
     ]
 
-    role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES
-    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
-    contact_number = models.CharField(
-        max_length=20,
-        blank=True
-    )
+    contact_number = models.CharField(max_length=20, blank=True)

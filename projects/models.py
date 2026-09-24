@@ -13,8 +13,7 @@ class Project(models.Model):
     end_date = models.DateField()
 
     team_members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name="projects"
+        settings.AUTH_USER_MODEL, related_name="projects"
     )
 
     def __str__(self):
