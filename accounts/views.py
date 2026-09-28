@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.response import Response
@@ -5,6 +7,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import LoginSerializer, UserSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterView(APIView):
@@ -14,6 +18,8 @@ class RegisterView(APIView):
 
         if serializer.is_valid():
             user = serializer.save()
+
+            logger.info("User registered: %s", user.email)
 
             return Response(
                 {"id": user.id, "email": user.email}, status=status.HTTP_201_CREATED
@@ -38,6 +44,8 @@ class LoginView(APIView):
             if user is not None:
 
                 refresh = RefreshToken.for_user(user)
+
+                logger.info("User logged in: %s", user.email)
 
                 return Response(
                     {"refresh": str(refresh), "access": str(refresh.access_token)}

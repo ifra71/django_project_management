@@ -1,12 +1,19 @@
+import logging
+
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Document
 from .serializers import DocumentSerializer
 
+logger = logging.getLogger(__name__)
+
 
 class DocumentListCreateView(APIView):
+
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         documents = Document.objects.all()
@@ -21,6 +28,8 @@ class DocumentListCreateView(APIView):
         if serializer.is_valid():
             document = serializer.save()
 
+            logger.info("Document created: %s", document.name)
+
             return Response(
                 DocumentSerializer(document).data, status=status.HTTP_201_CREATED
             )
@@ -29,6 +38,8 @@ class DocumentListCreateView(APIView):
 
 
 class DocumentDetailView(APIView):
+
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, document_id):
         document = Document.objects.get(id=document_id)
@@ -51,6 +62,8 @@ class DocumentDetailView(APIView):
 
     def delete(self, request, document_id):
         document = Document.objects.get(id=document_id)
+
+        logger.info("Document deleted: %s", document.name)
 
         document.delete()
 
