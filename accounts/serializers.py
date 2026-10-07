@@ -63,10 +63,3 @@ class RegisterSerializer(serializers.ModelSerializer):
         profile.save()
 
         return user
-
-
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        write_only=True,
-    )
